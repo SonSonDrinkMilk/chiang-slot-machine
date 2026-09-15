@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="description" content="政治諷刺小遊戲：選一題台北市政議題，拉出一組隨機官腔回答。" />
 <title>蔣式回答拉霸機</title>
 <style>
@@ -87,6 +87,22 @@ select{
   outline:none;
 }
 select:focus{border-color:var(--gold)}
+.full-question{
+  margin-top:10px;
+  padding:11px 12px;
+  border-radius:11px;
+  background:#142430;
+  border:1px solid #314c60;
+  color:#eef2f4;
+  line-height:1.6;
+  font-size:14px;
+}
+.full-question strong{
+  display:block;
+  color:var(--gold);
+  font-size:12px;
+  margin-bottom:4px;
+}
 .reels{
   display:grid;
   grid-template-columns:repeat(5,1fr);
@@ -243,16 +259,38 @@ footer{
 @media(max-width:900px){
   .reels{grid-template-columns:repeat(2,1fr)}
   .reel:last-child{grid-column:1/-1}
-  .reel{min-height:135px}
+  .reel{min-height:125px}
 }
-@media(max-width:620px){
-  body{padding-top:18px}
-  .machine{padding:16px 55px 18px 12px;border-radius:22px}
-  .reels{grid-template-columns:1fr}
+@media(max-width:700px){
+  body{padding:14px 10px 28px}
+  header{margin-bottom:12px}
+  .eyebrow{font-size:10px;letter-spacing:.18em;margin-bottom:6px}
+  h1{font-size:38px;line-height:1.05}
+  .subtitle{margin-top:7px;font-size:13px;line-height:1.5;padding:0 10px}
+  .machine{padding:12px;border-radius:22px}
+  .question-card{padding:11px;border-radius:14px}
+  .label{font-size:12px;margin-bottom:7px}
+  select{font-size:15px;padding:12px 38px 12px 12px;white-space:nowrap;text-overflow:ellipsis}
+  .full-question{margin-top:8px;padding:10px 11px;font-size:14px;line-height:1.55}
+  .reels{grid-template-columns:1fr;gap:7px;margin-top:10px}
   .reel:last-child{grid-column:auto}
-  .reel{min-height:112px}
-  .actions{flex-direction:column}
-  .lever{right:8px}
+  .reel{min-height:84px;padding:10px 12px;border-width:4px;border-radius:12px}
+  .reel small{font-size:11px;margin-bottom:5px;letter-spacing:.05em}
+  .reel .text{font-size:18px;line-height:1.35}
+  .answer{margin-top:10px;min-height:0;padding:11px 12px;font-size:13px}
+  .answer .quote{font-size:15px;line-height:1.6}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+  #spin{grid-column:1/-1;width:100%;padding:14px 16px;font-size:16px}
+  #randomQ,#copy{width:100%;padding:11px 10px;font-size:14px}
+  .lever{display:none}
+  .status{font-size:13px;padding:10px 11px}
+  .notes{margin-top:12px;padding:11px 12px;font-size:11px}
+  footer{margin-top:10px}
+}
+@media(max-width:380px){
+  h1{font-size:34px}
+  .reel .text{font-size:17px}
+  .full-question{font-size:13px}
 }
 </style>
 </head>
@@ -261,16 +299,17 @@ footer{
   <header>
     <div class="eyebrow">TAIPEI ANSWER GENERATOR</div>
     <h1>蔣式回答拉霸機</h1>
-    <p class="subtitle">
-      選一題台北市政爭議，把手往下一拉。五格轉完之後，
-      看看這次能不能得到一個真的有回答到問題的回答。
-    </p>
+    <p class="subtitle">選一題，看這次會怎麼回答。</p>
   </header>
 
   <main class="machine">
     <section class="question-card">
-      <div class="label">① 記者提問｜近期爭議＆熱門題庫</div>
+      <div class="label">① 今天問市長什麼？</div>
       <select id="question"></select>
+      <div class="full-question" id="fullQuestion">
+        <strong>完整提問</strong>
+        <span></span>
+      </div>
     </section>
 
     <section class="reels">
@@ -304,7 +343,7 @@ footer{
     </section>
 
     <div class="actions">
-      <button id="spin">🎰 拉霸回答</button>
+      <button id="spin">🎰 拉一下，看市長怎麼回答</button>
       <button id="randomQ">🎲 換一題</button>
       <button id="copy">複製結果</button>
     </div>
@@ -357,6 +396,34 @@ const questions = [
   "【治理】議員索取市政資料卻演變成政治攻防，市府如何確保議會監督與資訊透明？",
   "【市政】面對連續公共工程與設施爭議，市府如何證明不是每次都等出事後才檢討？",
   "【市政】市府多次使用「研議、盤點、檢討」回應爭議，具體完成了哪些改善？"
+];
+
+const shortLabels = [
+  "🔥 DNA 身世疑問",
+  "🍱 成淵營養午餐",
+  "🍱 食安委員會出席",
+  "🍱 免費營養午餐招標",
+  "♻️ 營養午餐剩食",
+  "🚌 413萬候車亭",
+  "🚇 北捷座椅扶手",
+  "🚇 廣慈／奉天宮站",
+  "🚗 公館圓環",
+  "🚬 無菸城市規劃",
+  "🚬 吸菸區選址",
+  "🚬 公館吸菸區拆除",
+  "🚬 吸菸設施低使用率",
+  "🐭 台北鼠患",
+  "🌧️ 內湖積淹水",
+  "🕳️ 五分埔路面塌陷",
+  "🌳 樹木修剪與移植",
+  "☂️ 信義區遮陽設施",
+  "☂️ 遮陽設施預算",
+  "👶 幼兒園不當對待",
+  "👧 兒少保護機制",
+  "🏠 高齡住宅量能",
+  "📄 議員索資爭議",
+  "🏗️ 公共工程連環爭議",
+  "🧾 研議盤點檢討"
 ];
 
 const pools = [
@@ -460,12 +527,17 @@ function getActivePools(){
 }
 
 const q = document.getElementById("question");
+const fullQuestion = document.querySelector("#fullQuestion span");
 questions.forEach((text,i)=>{
   const o=document.createElement("option");
   o.value=text;
-  o.textContent=text;
+  o.textContent=shortLabels[i] || text;
   q.appendChild(o);
 });
+
+function updateFullQuestion(){
+  fullQuestion.textContent = q.value;
+}
 
 const reelEls = [1,2,3,4,5].map(i=>document.querySelector(`#reel${i} .text`));
 const reelBoxes = [1,2,3,4,5].map(i=>document.getElementById(`reel${i}`));
@@ -570,13 +642,14 @@ function pickQuestion(){
   if(questions.length>1 && q.selectedIndex===idx) idx=(idx+1)%questions.length;
   q.selectedIndex=idx;
   updateModeLabels();
+  updateFullQuestion();
   renderAnswer(finalAnswer);
 }
 
 spin.addEventListener("click",doSpin);
 lever.addEventListener("click",doSpin);
 randomQ.addEventListener("click",pickQuestion);
-q.addEventListener("change",()=>{ updateModeLabels(); renderAnswer(finalAnswer); });
+q.addEventListener("change",()=>{ updateModeLabels(); updateFullQuestion(); renderAnswer(finalAnswer); });
 
 copy.addEventListener("click", async ()=>{
   const txt = `問題：${q.value}\n本次回答：${finalAnswer.join("")}\n\n#蔣式回答拉霸機 #政治諷刺`;
@@ -591,6 +664,7 @@ copy.addEventListener("click", async ()=>{
 });
 
 updateModeLabels();
+updateFullQuestion();
 renderAnswer(finalAnswer);
 </script>
 </body>
