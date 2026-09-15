@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="政治諷刺小遊戲：選一題台北市政議題，拉出一組隨機官腔回答。" />
+<title>蔣式回答拉霸機</title>
+<style>
+:root{
+  --bg:#0d141b;
+  --panel:#182532;
+  --panel2:#22384a;
+  --line:#3e586b;
+  --paper:#f5f0e4;
+  --ink:#17222b;
+  --text:#f6f3eb;
+  --muted:#aab8c4;
+  --gold:#efc56d;
+  --red:#bf3e46;
+  --green:#68b887;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  background:
+    radial-gradient(circle at 50% -10%, #2a465c 0%, transparent 38%),
+    linear-gradient(180deg,#101a23 0%,#091017 100%);
+  color:var(--text);
+  padding:28px 14px 44px;
+}
+.wrap{width:min(1080px,100%);margin:0 auto}
+header{text-align:center;margin-bottom:20px}
+.eyebrow{
+  color:var(--gold);
+  font-size:12px;
+  letter-spacing:.24em;
+  font-weight:900;
+  margin-bottom:9px
+}
+h1{
+  margin:0;
+  font-size:clamp(34px,7vw,68px);
+  line-height:1;
+  letter-spacing:-.04em;
+}
+.subtitle{
+  color:var(--muted);
+  margin:12px auto 0;
+  max-width:720px;
+  line-height:1.7;
+  font-size:14px
+}
+.machine{
+  position:relative;
+  border:2px solid var(--line);
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border-radius:30px;
+  padding:24px 76px 24px 24px;
+  box-shadow:0 28px 90px #0009,inset 0 0 0 4px #fff1;
+}
+.question-card{
+  background:#0c1821aa;
+  border:1px solid #425d71;
+  border-radius:16px;
+  padding:15px;
+}
+.label{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  color:var(--gold);
+  font-weight:900;
+  font-size:13px;
+  margin-bottom:9px;
+}
+select{
+  width:100%;
+  border:1px solid var(--line);
+  background:#0c171f;
+  color:var(--text);
+  padding:13px 14px;
+  border-radius:12px;
+  font-size:15px;
+  line-height:1.4;
+  outline:none;
+}
+select:focus{border-color:var(--gold)}
+.reels{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:9px;
+  margin-top:16px;
+}
+.reel{
+  min-height:185px;
+  padding:16px 11px;
+  border:5px solid #0c151d;
+  border-radius:14px;
+  background:var(--paper);
+  color:var(--ink);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 10px 22px #0002;
+}
+.reel:before,.reel:after{
+  content:"";
+  position:absolute;
+  left:0;right:0;
+  height:28px;
+  pointer-events:none;
+}
+.reel:before{top:0;background:linear-gradient(#0002,transparent)}
+.reel:after{bottom:0;background:linear-gradient(transparent,#0002)}
+.reel small{
+  color:#7d6b51;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.13em;
+  margin-bottom:11px
+}
+.reel .text{
+  font-size:clamp(14px,1.8vw,19px);
+  line-height:1.45;
+  font-weight:900;
+}
+.reel.spinning .text{animation:jitter .08s linear infinite}
+@keyframes jitter{
+  0%{transform:translateY(-8px);filter:blur(1px)}
+  50%{transform:translateY(9px);filter:blur(2px)}
+  100%{transform:translateY(-8px);filter:blur(1px)}
+}
+.status{
+  display:none;
+  margin-top:15px;
+  border-radius:13px;
+  padding:12px 14px;
+  background:#2d2211;
+  border:1px solid #7f6636;
+  color:#f4d792;
+  font-weight:900;
+  text-align:center
+}
+.status.show{display:block;animation:pop .35s ease}
+@keyframes pop{
+  from{transform:scale(.96);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.answer{
+  margin-top:15px;
+  min-height:98px;
+  border:1px dashed #5d778b;
+  border-radius:14px;
+  background:#0b151ddd;
+  padding:15px 16px;
+  line-height:1.75;
+  font-size:15px;
+}
+.answer b{color:var(--gold)}
+.answer .quote{font-size:17px;font-weight:800}
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+button{
+  border:0;
+  border-radius:12px;
+  padding:13px 17px;
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+}
+button:disabled{opacity:.6;cursor:not-allowed}
+#spin{
+  flex:1;
+  background:var(--gold);
+  color:#241d11;
+}
+#randomQ{
+  background:#355068;
+  color:#fff;
+}
+#copy{
+  background:#304357;
+  color:#fff;
+}
+.lever{
+  position:absolute;
+  right:18px;
+  top:38%;
+  width:40px;
+  height:160px;
+  cursor:pointer;
+  user-select:none;
+}
+.lever .stick{
+  position:absolute;
+  top:30px;left:17px;
+  width:8px;height:112px;
+  border-radius:999px;
+  background:#c9ced2;
+  transform-origin:50% 90%;
+  transition:transform .22s ease;
+  box-shadow:inset -2px 0 2px #0005;
+}
+.lever .ball{
+  position:absolute;
+  top:0;left:3px;
+  width:34px;height:34px;
+  border-radius:50%;
+  background:var(--red);
+  box-shadow:inset -5px -6px 8px #0004,0 5px 10px #0007;
+  transition:transform .22s ease;
+}
+.lever.pull .stick{transform:rotate(24deg) translateY(27px)}
+.lever.pull .ball{transform:translate(22px,38px)}
+.notes{
+  margin-top:18px;
+  border:1px solid #2f4658;
+  border-radius:15px;
+  background:#101a22cc;
+  padding:14px 16px;
+  color:#9fb0bd;
+  font-size:12px;
+  line-height:1.75;
+}
+.notes strong{color:#dce5eb}
+details{margin-top:10px}
+summary{cursor:pointer;color:#d7e1e7;font-weight:800}
+footer{
+  text-align:center;
+  margin-top:16px;
+  color:#708491;
+  font-size:11px;
+}
+@media(max-width:900px){
+  .reels{grid-template-columns:repeat(2,1fr)}
+  .reel:last-child{grid-column:1/-1}
+  .reel{min-height:135px}
+}
+@media(max-width:620px){
+  body{padding-top:18px}
+  .machine{padding:16px 55px 18px 12px;border-radius:22px}
+  .reels{grid-template-columns:1fr}
+  .reel:last-child{grid-column:auto}
+  .reel{min-height:112px}
+  .actions{flex-direction:column}
+  .lever{right:8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">TAIPEI ANSWER GENERATOR</div>
+    <h1>蔣式回答拉霸機</h1>
+    <p class="subtitle">
+      選一題台北市政爭議，把手往下一拉。五格轉完之後，
+      看看這次能不能得到一個真的有回答到問題的回答。
+    </p>
+  </header>
+
+  <main class="machine">
+    <section class="question-card">
+      <div class="label">① 記者提問｜近期台北市政題庫</div>
+      <select id="question"></select>
+    </section>
+
+    <section class="reels">
+      <div class="reel" id="reel1">
+        <small>第一格｜我知道了</small>
+        <div class="text">我們都有掌握。</div>
+      </div>
+      <div class="reel" id="reel2">
+        <small>第二格｜交代下去</small>
+        <div class="text">我已經請相關局處了解。</div>
+      </div>
+      <div class="reel" id="reel3">
+        <small>第三格｜還不能回答</small>
+        <div class="text">目前正在研議。</div>
+      </div>
+      <div class="reel" id="reel4">
+        <small>第四格｜下一步會做</small>
+        <div class="text">我們會滾動式檢討。</div>
+      </div>
+      <div class="reel" id="reel5">
+        <small>第五格｜漂亮收尾</small>
+        <div class="text">市府團隊會全力以赴。</div>
+      </div>
+    </section>
+
+    <div class="status" id="status">🎉 萬安大滿貫：掌握 → 局處 → 研議 → 檢討 → 全力以赴</div>
+
+    <section class="answer" id="answer">
+      <b>本次回答：</b><br>
+      <span class="quote">我們都有掌握。我已經請相關局處了解。目前正在研議。我們會滾動式檢討。市府團隊會全力以赴。</span>
+    </section>
+
+    <div class="actions">
+      <button id="spin">🎰 拉霸回答</button>
+      <button id="randomQ">🎲 換一題</button>
+      <button id="copy">複製結果</button>
+    </div>
+
+    <div class="lever" id="lever" title="拉一下">
+      <div class="stick"></div>
+      <div class="ball"></div>
+    </div>
+  </main>
+
+  <section class="notes">
+    <strong>說明：</strong>本頁為政治諷刺／戲仿作品。題目以 2026 年台北市公開報導中的市政爭議為靈感，
+    採疑問句整理，不代表對責任歸屬的司法或事實判定。拉霸中的回答為常見官腔句型與使用者提供語料之隨機拆解重組，
+    <strong>不代表蔣萬安本人曾以該完整句子回答所選問題。</strong>
+    <details>
+      <summary>題庫包含哪些議題？</summary>
+      內容涵蓋營養午餐與食安、木柵公園公共藝術候車亭、捷運座椅與扶手、廣慈／奉天宮站、
+      公館圓環、無菸城市與吸菸區、遮陽設施、鼠患、內湖積淹水、路面塌陷、樹木管理、
+      幼兒園兒少安全、高齡住宅等公開討論議題。
+    </details>
+  </section>
+
+  <footer>PARODY / SATIRE · 單頁 HTML，不蒐集使用者資料</footer>
+</div>
+
+<script>
+const questions = [
+  "【食安】成淵高中國中部發生多名學生腹瀉，市府後續如何強化校園供餐食安？",
+  "【食安】市長的食品安全委員會出席狀況遭議員質疑，市府如何回應監督責任？",
+  "【營養午餐】免費營養午餐上路前，部分學校招標進度曾引發質疑，市府如何確保供餐穩定？",
+  "【營養午餐】教育局曾提到剩食交流，引發爭議後市府如何規劃廚餘與剩食配套？",
+  "【公共工程】木柵公園公共藝術候車亭尚未正式啟用就出現植栽與鏽水爭議，驗收把關出了什麼問題？",
+  "【捷運】北捷調整部分座椅、扶手與吊環後，如何兼顧無障礙與乘客安全？",
+  "【捷運】廣慈／奉天宮站曾出現天花板局部脫落與滲水，正式通車前如何確保安全？",
+  "【交通】公館圓環拆除後，市府如何評估交通成效與後續調整？",
+  "【無菸城市】政策已宣布，為什麼完整規劃與執行標準還需要持續補強？",
+  "【無菸城市】吸菸區曾被質疑設在公園、綠地或敏感地點附近，選址標準究竟是什麼？",
+  "【無菸城市】公館吸菸區設置後又拆除，前期規劃與經費如何檢討？",
+  "【無菸城市】部分吸菸設施使用率偏低，市府當初如何評估選址與需求？",
+  "【市容】台北鼠患問題受到關注，市府的跨局處治理為什麼沒有更早看到成效？",
+  "【防災】內湖積淹水後，市府如何檢討排水、預警與通知機制？",
+  "【道路】五分埔一帶曾發生路面塌陷，市府如何全面掌握道路與地下管線風險？",
+  "【樹木】近期樹木修剪、移植與管理引發爭議，市府是否有一致且透明的標準？",
+  "【遮陽設施】信義區遮陽設施被質疑與既有樹蔭衝突，市府設置原則是什麼？",
+  "【遮陽設施】遮陽設施的設計、監造與工程經費曾引發議會攻防，市府如何說清楚預算？",
+  "【兒少】幼兒園發生不當對待爭議，既有稽查制度為什麼沒有更早發現風險？",
+  "【兒少】兒少保護案件遭質疑風險評估與安置速度不足，市府如何補強機制？",
+  "【居住】沒有自有住宅的高齡人口不少，但老人住宅量能有限，市府要如何擴充？",
+  "【治理】議員索取市政資料卻演變成政治攻防，市府如何確保議會監督與資訊透明？",
+  "【市政】面對連續公共工程與設施爭議，市府如何證明不是每次都等出事後才檢討？",
+  "【市政】市府多次使用「研議、盤點、檢討」回應爭議，具體完成了哪些改善？"
+];
+
+const pools = [
+  [
+    "我們都有掌握。",
+    "相關局處都有持續向我報告。",
+    "我第一時間就掌握相關狀況。",
+    "這件事情市府一直都有掌握。",
+    "我們從第一時間就開始處理。",
+    "市府團隊都沒有鬆懈。",
+    "相關單位都有第一時間回報。"
+  ],
+  [
+    "我已經請相關局處了解。",
+    "我已經請相關局處進一步說明。",
+    "請相關局處對外完整說明。",
+    "已經要求相關單位處理。",
+    "會由相關局處共同處理。",
+    "今天也已經請相關單位掌握。",
+    "會請局處首長進一步說明。",
+    "已責成相關單位檢視。"
+  ],
+  [
+    "目前正在了解當中。",
+    "目前正在研議。",
+    "這部分還需要進一步釐清。",
+    "目前還沒有定案。",
+    "還需要完整掌握相關資訊。",
+    "會再進一步了解實際狀況。",
+    "各方意見都有納入評估。",
+    "這部分我們會審慎評估。"
+  ],
+  [
+    "我們會進一步檢視。",
+    "會請相關局處提出具體方案。",
+    "會召集跨局處會議研議。",
+    "我們會滾動式檢討。",
+    "會持續盤點、評估。",
+    "會持續蒐集各界意見。",
+    "會針對制度面全面檢視。",
+    "會研議具體的因應措施。",
+    "有需要改善的地方就即刻改善。",
+    "有需要改進的地方，我們會檢討。"
+  ],
+  [
+    "市府團隊會全力以赴。",
+    "市民安全永遠是最優先考量。",
+    "一切依法行政、依法處理。",
+    "市府會持續努力。",
+    "我們會傾聽第一線的聲音。",
+    "會持續與中央溝通。",
+    "相關批評還是應該本於事實。",
+    "市府團隊都有做好分工。",
+    "我們不會迴避制度面的問題。",
+    "讓政策更貼近市民實際需求。",
+    "我們會持續關注、持續掌握。"
+  ]
+];
+
+const q = document.getElementById("question");
+questions.forEach((text,i)=>{
+  const o=document.createElement("option");
+  o.value=text;
+  o.textContent=text;
+  q.appendChild(o);
+});
+
+const reelEls = [1,2,3,4,5].map(i=>document.querySelector(`#reel${i} .text`));
+const reelBoxes = [1,2,3,4,5].map(i=>document.getElementById(`reel${i}`));
+const answer = document.getElementById("answer");
+const spin = document.getElementById("spin");
+const copy = document.getElementById("copy");
+const randomQ = document.getElementById("randomQ");
+const lever = document.getElementById("lever");
+const status = document.getElementById("status");
+
+let spinning=false;
+let finalAnswer = reelEls.map(x=>x.textContent);
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+function renderAnswer(parts){
+  finalAnswer = parts;
+  answer.innerHTML =
+    `<b>問題：</b>${escapeHtml(q.value)}<br>`+
+    `<b>本次回答：</b><br>`+
+    `<span class="quote">${escapeHtml(parts.join(""))}</span>`;
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[m]);
+}
+
+function isJackpot(parts){
+  return (
+    /掌握/.test(parts[0]) &&
+    /(局處|相關單位|首長)/.test(parts[1]) &&
+    /(研議|釐清|評估|了解)/.test(parts[2]) &&
+    /(檢討|方案|研議|盤點|檢視|改善)/.test(parts[3]) &&
+    /(全力以赴|持續努力|掌握|依法|安全)/.test(parts[4])
+  );
+}
+
+function doSpin(){
+  if(spinning) return;
+  spinning=true;
+  spin.disabled=true;
+  status.classList.remove("show");
+  lever.classList.add("pull");
+  reelBoxes.forEach(x=>x.classList.add("spinning"));
+
+  const timers = pools.map((pool,i)=>
+    setInterval(()=> reelEls[i].textContent=pick(pool), 65+i*12)
+  );
+
+  const parts = pools.map(p=>pick(p));
+  const stops = [620,780,940,1110,1310];
+
+  stops.forEach((delay,i)=>{
+    setTimeout(()=>{
+      clearInterval(timers[i]);
+      reelEls[i].textContent=parts[i];
+      reelBoxes[i].classList.remove("spinning");
+
+      if(i===4){
+        renderAnswer(parts);
+        if(isJackpot(parts)){
+          status.textContent="🎉 萬安大滿貫：掌握 → 局處 → 研議 → 檢討 → 收尾";
+          status.classList.add("show");
+        }
+        spinning=false;
+        spin.disabled=false;
+        lever.classList.remove("pull");
+      }
+    },delay);
+  });
+}
+
+function pickQuestion(){
+  let idx=Math.floor(Math.random()*questions.length);
+  if(questions.length>1 && q.selectedIndex===idx) idx=(idx+1)%questions.length;
+  q.selectedIndex=idx;
+  renderAnswer(finalAnswer);
+}
+
+spin.addEventListener("click",doSpin);
+lever.addEventListener("click",doSpin);
+randomQ.addEventListener("click",pickQuestion);
+q.addEventListener("change",()=>renderAnswer(finalAnswer));
+
+copy.addEventListener("click", async ()=>{
+  const txt = `問題：${q.value}\n本次回答：${finalAnswer.join("")}\n\n#蔣式回答拉霸機 #政治諷刺`;
+  try{
+    await navigator.clipboard.writeText(txt);
+    const old=copy.textContent;
+    copy.textContent="已複製 ✓";
+    setTimeout(()=>copy.textContent=old,1100);
+  }catch(e){
+    window.prompt("複製以下文字：",txt);
+  }
+});
+
+renderAnswer(finalAnswer);
+</script>
+</body>
+</html>
