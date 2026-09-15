@@ -316,7 +316,9 @@ footer{
   </main>
 
   <section class="notes">
-    <strong>說明：</strong>本頁為政治諷刺作品。題目以 2026 年台北市公開報導中的市政爭議為主題，採疑問句整理，不代表對責任歸屬的司法或事實判定。拉霸中的回答係依蔣萬安公開回應中常見句型及網路公開語料整理後隨機拆解重組，不代表蔣萬安本人曾以該完整句子回答所選問題。</strong>
+    <strong>說明：</strong>本頁為政治諷刺作品。題目以 2026 年台北市公開報導中的市政爭議與公開討論議題為主題，
+    採疑問句整理，不代表對責任歸屬的司法或事實判定。拉霸中的回答係依蔣萬安公開回應中常見句型及網路公開語料整理後隨機拆解重組，
+    <strong>不代表蔣萬安本人曾以該完整句子回答所選問題。</strong>
     <details>
       <summary>題庫包含哪些議題？</summary>
       內容涵蓋營養午餐與食安、木柵公園公共藝術候車亭、捷運座椅與扶手、廣慈／奉天宮站、
@@ -414,6 +416,49 @@ const pools = [
   ]
 ];
 
+
+const dnaPools = [
+  [
+    "這部分涉及個人與家族層面的議題。",
+    "相關身分議題過去已有公開討論。",
+    "外界對這件事情一直有不同看法。",
+    "這部分我想社會上已有很多討論。",
+    "對於大家的關心，我都理解。"
+  ],
+  [
+    "對於各界不同意見，我們都尊重。",
+    "我想沒有必要隨著每一個說法起舞。",
+    "相關資料與說法，外界都可以自行檢視。",
+    "這部分並不影響我目前的公共職務。",
+    "我沒有辦法回應每一種外界揣測。"
+  ],
+  [
+    "至於是否進一步做 DNA 檢驗，這屬於個人選擇。",
+    "目前沒有這樣的規劃。",
+    "這部分沒有進一步補充。",
+    "目前沒有新的說明。",
+    "我想現階段沒有必要再做額外回應。"
+  ],
+  [
+    "我現在更關心的是市民每天面對的問題。",
+    "我的重點還是放在市政工作。",
+    "我會把時間放在市政推動上。",
+    "對我來說，把市政做好才是最重要的。",
+    "我還是會專注在市長應該做的事情。"
+  ],
+  [
+    "市民更在意的還是市政成果。",
+    "我會用實際市政表現接受大家檢驗。",
+    "市府團隊會繼續把該做的事情做好。",
+    "謝謝大家關心。",
+    "我想還是回到市政本身。"
+  ]
+];
+
+function getActivePools(){
+  return q.value.includes("DNA") ? dnaPools : pools;
+}
+
 const q = document.getElementById("question");
 questions.forEach((text,i)=>{
   const o=document.createElement("option");
@@ -430,6 +475,29 @@ const copy = document.getElementById("copy");
 const randomQ = document.getElementById("randomQ");
 const lever = document.getElementById("lever");
 const status = document.getElementById("status");
+
+
+const genericLabels = [
+  "第一格｜我知道了",
+  "第二格｜交代下去",
+  "第三格｜還不能回答",
+  "第四格｜下一步會做",
+  "第五格｜漂亮收尾"
+];
+const dnaLabels = [
+  "第一格｜先切割",
+  "第二格｜尊重各界",
+  "第三格｜不正面回應",
+  "第四格｜拉回市政",
+  "第五格｜漂亮收尾"
+];
+
+function updateModeLabels(){
+  const labels = q.value.includes("DNA") ? dnaLabels : genericLabels;
+  reelBoxes.forEach((box,i)=>{
+    box.querySelector("small").textContent = labels[i];
+  });
+}
 
 let spinning=false;
 let finalAnswer = reelEls.map(x=>x.textContent);
@@ -468,11 +536,13 @@ function doSpin(){
   lever.classList.add("pull");
   reelBoxes.forEach(x=>x.classList.add("spinning"));
 
-  const timers = pools.map((pool,i)=>
+  const activePools = getActivePools();
+
+  const timers = activePools.map((pool,i)=>
     setInterval(()=> reelEls[i].textContent=pick(pool), 65+i*12)
   );
 
-  const parts = pools.map(p=>pick(p));
+  const parts = activePools.map(p=>pick(p));
   const stops = [620,780,940,1110,1310];
 
   stops.forEach((delay,i)=>{
@@ -499,13 +569,14 @@ function pickQuestion(){
   let idx=Math.floor(Math.random()*questions.length);
   if(questions.length>1 && q.selectedIndex===idx) idx=(idx+1)%questions.length;
   q.selectedIndex=idx;
+  updateModeLabels();
   renderAnswer(finalAnswer);
 }
 
 spin.addEventListener("click",doSpin);
 lever.addEventListener("click",doSpin);
 randomQ.addEventListener("click",pickQuestion);
-q.addEventListener("change",()=>renderAnswer(finalAnswer));
+q.addEventListener("change",()=>{ updateModeLabels(); renderAnswer(finalAnswer); });
 
 copy.addEventListener("click", async ()=>{
   const txt = `問題：${q.value}\n本次回答：${finalAnswer.join("")}\n\n#蔣式回答拉霸機 #政治諷刺`;
@@ -519,6 +590,7 @@ copy.addEventListener("click", async ()=>{
   }
 });
 
+updateModeLabels();
 renderAnswer(finalAnswer);
 </script>
 </body>
