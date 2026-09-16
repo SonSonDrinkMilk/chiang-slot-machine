@@ -203,7 +203,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
   background:#355068;
   color:#fff;
 }
-#copy{
+#copy,#share{
   background:#304357;
   color:#fff;
 }
@@ -279,7 +279,7 @@ footer{
   .reel .text{font-size:18px;line-height:1.35}
   .answer{margin-top:10px;min-height:0;padding:11px 12px;font-size:13px}
   .answer .quote{font-size:15px;line-height:1.6}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+  .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px}
   #spin{grid-column:1/-1;width:100%;padding:14px 16px;font-size:16px}
   #randomQ,#copy{width:100%;padding:11px 10px;font-size:14px}
   .lever{display:none}
@@ -346,6 +346,7 @@ footer{
       <button id="spin">🎰 拉一下，看市長怎麼回答</button>
       <button id="randomQ">🎲 換一題</button>
       <button id="copy">複製結果</button>
+      <button id="share">分享結果</button>
     </div>
 
     <div class="lever" id="lever" title="拉一下">
@@ -356,7 +357,7 @@ footer{
 
   <section class="notes">
     <strong>說明：</strong>本頁為政治諷刺作品。題目以 2026 年台北市公開報導中的市政爭議與公開討論議題為主題，
-    採疑問句整理，不代表對責任歸屬的司法或事實判定。拉霸中的回答係依蔣萬安公開回應中常見句型及網路公開語料整理後隨機拆解重組，
+    採疑問句整理，不代表對責任歸屬的司法或事實判定。拉霸中的回答係依公開回應中常見句型、網路公開語料與諷刺彩蛋整理後隨機拆解重組，
     <strong>不代表蔣萬安本人曾以該完整句子回答所選問題。</strong>
     <details>
       <summary>題庫包含哪些議題？</summary>
@@ -431,55 +432,59 @@ const pools = [
     "我們都有掌握。",
     "相關局處都有持續向我報告。",
     "我第一時間就掌握相關狀況。",
-    "這件事情市府一直都有掌握。",
-    "我們從第一時間就開始處理。",
-    "市府團隊都沒有鬆懈。",
-    "相關單位都有第一時間回報。"
+    "我們會持續關注、持續掌握。"
   ],
   [
     "我已經請相關局處了解。",
-    "我已經請相關局處進一步說明。",
-    "請相關局處對外完整說明。",
-    "已經要求相關單位處理。",
-    "會由相關局處共同處理。",
-    "今天也已經請相關單位掌握。",
-    "會請局處首長進一步說明。",
-    "已責成相關單位檢視。"
+    "我已經請 OO 局處進一步說明。",
+    "請 OO 局長說明。",
+    "請相關局處對外說明。",
+    "我們會即刻處理。",
+    "已經要求相關局處即刻處理。",
+    "已經要求 OO 局處即刻處理。",
+    "我們會即刻處理。"
   ],
   [
     "目前正在了解當中。",
     "目前正在研議。",
+    "我們會審慎評估。",
     "這部分還需要進一步釐清。",
-    "目前還沒有定案。",
-    "還需要完整掌握相關資訊。",
-    "會再進一步了解實際狀況。",
-    "各方意見都有納入評估。",
-    "這部分我們會審慎評估。"
+    "目前還沒有定案。"
   ],
   [
     "我們會進一步檢視。",
     "會請相關局處提出具體方案。",
     "會召集跨局處會議研議。",
     "我們會滾動式檢討。",
-    "會持續盤點、評估。",
-    "會持續蒐集各界意見。",
-    "會針對制度面全面檢視。",
-    "會研議具體的因應措施。",
-    "有需要改善的地方就即刻改善。",
+    "我們會持續追蹤後續進度。",
+    "會全面檢視相關機制。",
+    "我們會持續精進、改善。",
+    "會強化相關作為。",
+    "即刻建立更完善的機制。",
+    "即刻建立更完善的機制。",
+    "我們會避免類似事件再次發生。",
+    "會釐清責任、依法處理。",
     "有需要改進的地方，我們會檢討。"
   ],
   [
-    "市府團隊會全力以赴。",
-    "市民安全永遠是最優先考量。",
-    "一切依法行政、依法處理。",
-    "市府會持續努力。",
-    "我們會傾聽第一線的聲音。",
     "會持續與中央溝通。",
-    "相關批評還是應該本於事實。",
-    "市府團隊都有做好分工。",
-    "我們不會迴避制度面的問題。",
-    "讓政策更貼近市民實際需求。",
-    "我們會持續關注、持續掌握。"
+    "市府團隊會全力以赴。",
+    "市府能做的我們都會做。",
+    "這部分涉及中央權責。",
+    "這不是地方政府單方面可以處理的。",
+    "需要中央一起來處理。",
+    "我們會持續跟中央溝通。",
+    "我們會積極向中央爭取。",
+    "這部分涉及中央法規制度。",
+    "建請中央儘速修法。",
+    "呼籲中央放寬相關規定。",
+    "希望中央給地方政府更多彈性。",
+    "中央應該提出更完整的配套措施。",
+    "我們會把地方的意見帶回中央。",
+    "地方有地方的難處，希望中央能夠理解。",
+    "中央如果能夠修法，地方就能更有效處理。",
+    "希望中央正視地方政府的聲音。",
+    "市府團隊會全力以赴，給市民一個交代。"
   ]
 ];
 
@@ -522,6 +527,23 @@ const dnaPools = [
   ]
 ];
 
+
+const bureauMap = {
+  1:["教育局","衛生局"], 2:["衛生局"], 3:["教育局"], 4:["教育局","環保局"],
+  5:["都發局","工務局"], 6:["捷運局"], 7:["捷運局"], 8:["交通局","工務局"],
+  9:["衛生局"], 10:["衛生局"], 11:["衛生局","工務局"], 12:["衛生局"],
+  13:["環保局","衛生局"], 14:["工務局","水利處"], 15:["工務局"],
+  16:["工務局","公園處"], 17:["都發局","工務局"], 18:["都發局"],
+  19:["教育局","社會局"], 20:["社會局"], 21:["社會局","都發局"], 22:["秘書處"]
+};
+
+function fillOO(text){
+  const choices = bureauMap[q.selectedIndex] || ["相關局處"];
+  const bureau = pick(choices);
+  const chief = bureau.endsWith("局") ? bureau + "長" : bureau + "主管";
+  return text.replaceAll("OO 局處", bureau).replaceAll("OO 局長", chief);
+}
+
 function getActivePools(){
   return q.value.includes("DNA") ? dnaPools : pools;
 }
@@ -544,17 +566,18 @@ const reelBoxes = [1,2,3,4,5].map(i=>document.getElementById(`reel${i}`));
 const answer = document.getElementById("answer");
 const spin = document.getElementById("spin");
 const copy = document.getElementById("copy");
+const share = document.getElementById("share");
 const randomQ = document.getElementById("randomQ");
 const lever = document.getElementById("lever");
 const status = document.getElementById("status");
 
 
 const genericLabels = [
-  "第一格｜我知道了",
-  "第二格｜交代下去",
-  "第三格｜還不能回答",
-  "第四格｜下一步會做",
-  "第五格｜漂亮收尾"
+  "第一格｜先掌握",
+  "第二格｜再交辦",
+  "第三格｜研議中",
+  "第四格｜即刻檢討",
+  "第五格｜中央／收尾"
 ];
 const dnaLabels = [
   "第一格｜先切割",
@@ -580,8 +603,8 @@ function renderAnswer(parts){
   finalAnswer = parts;
   answer.innerHTML =
     `<b>問題：</b>${escapeHtml(q.value)}<br>`+
-    `<b>本次回答：</b><br>`+
-    `<span class="quote">${escapeHtml(parts.join(""))}</span>`;
+    `<b>本次回答：</b>`+
+    `<div class="answer-lines">${parts.map(x=>`<div class="answer-line">${escapeHtml(x)}</div>`).join("")}</div>`;
 }
 
 function escapeHtml(str){
@@ -609,13 +632,17 @@ function doSpin(){
   reelBoxes.forEach(x=>x.classList.add("spinning"));
 
   const activePools = getActivePools();
+  const isDna = q.value.includes("DNA");
 
   const timers = activePools.map((pool,i)=>
-    setInterval(()=> reelEls[i].textContent=pick(pool), 65+i*12)
+    setInterval(()=> reelEls[i].textContent=fillOO(pick(pool)), 65+i*12)
   );
 
-  const parts = activePools.map(p=>pick(p));
-  const stops = [620,780,940,1110,1310];
+  const parts = activePools.map(p=>fillOO(pick(p)));
+  const milk = !isDna && Math.random() < 0.10;
+  if(milk) parts[4] = "生生喝鮮奶。";
+
+  const stops = [560,710,860,1010,1180];
 
   stops.forEach((delay,i)=>{
     setTimeout(()=>{
@@ -625,7 +652,15 @@ function doSpin(){
 
       if(i===4){
         renderAnswer(parts);
-        if(isJackpot(parts)){
+        updateModeLabels();
+        if(milk){
+          reelBoxes[4].querySelector("small").textContent="第五格｜🥛 鮮奶亂入";
+          status.textContent="🥛 彩蛋觸發：生生喝鮮奶";
+          status.classList.add("show");
+        }else if(!isDna && parts.some(x=>x.includes("即刻"))){
+          status.textContent="⚡ 即刻模式：這次真的很即刻";
+          status.classList.add("show");
+        }else if(!isDna && isJackpot(parts)){
           status.textContent="🎉 萬安大滿貫：掌握 → 局處 → 研議 → 檢討 → 收尾";
           status.classList.add("show");
         }
@@ -652,7 +687,7 @@ randomQ.addEventListener("click",pickQuestion);
 q.addEventListener("change",()=>{ updateModeLabels(); updateFullQuestion(); renderAnswer(finalAnswer); });
 
 copy.addEventListener("click", async ()=>{
-  const txt = `問題：${q.value}\n本次回答：${finalAnswer.join("")}\n\n#蔣式回答拉霸機 #政治諷刺`;
+  const txt = `問題：${q.value}\n本次回答：\n${finalAnswer.map(x=>"・"+x).join("\n")}\n\n#蔣式回答拉霸機 #政治諷刺`;
   try{
     await navigator.clipboard.writeText(txt);
     const old=copy.textContent;
@@ -660,6 +695,25 @@ copy.addEventListener("click", async ()=>{
     setTimeout(()=>copy.textContent=old,1100);
   }catch(e){
     window.prompt("複製以下文字：",txt);
+  }
+});
+
+
+share.addEventListener("click", async ()=>{
+  const txt = `問題：${q.value}\n本次回答：\n${finalAnswer.map(x=>"・"+x).join("\n")}\n\n#蔣式回答拉霸機 #政治諷刺`;
+  if(navigator.share){
+    try{
+      await navigator.share({title:"蔣式回答拉霸機", text:txt, url:location.href});
+    }catch(e){}
+  }else{
+    try{
+      await navigator.clipboard.writeText(txt+"\n"+location.href);
+      const old=share.textContent;
+      share.textContent="已複製分享文字 ✓";
+      setTimeout(()=>share.textContent=old,1200);
+    }catch(e){
+      window.prompt("複製以下文字分享：",txt+"\n"+location.href);
+    }
   }
 });
 
